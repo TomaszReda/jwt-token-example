@@ -7,10 +7,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.test.jwttokenexample.dto.UserDTO;
+import pl.test.jwttokenexample.model.DAORole;
 import pl.test.jwttokenexample.model.DAOUser;
 import pl.test.jwttokenexample.repository.UserDaoRepository;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
@@ -37,6 +39,9 @@ public class JwtUserDetailsService implements UserDetailsService {
         DAOUser newUser = new DAOUser();
         newUser.setUsername(user.getUsername());
         newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
+        List<DAORole> roles = new ArrayList<>();
+        user.getRole().stream().forEach(x -> roles.add(new DAORole(x.getName())));
+        newUser.getRoles().addAll(roles);
         return userDao.save(newUser);
     }
 }
