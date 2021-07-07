@@ -12,13 +12,6 @@ public class DAORole {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column
-    private String name;
-
-    public DAORole(String name) {
-        this.name = name;
-    }
-
-    public DAORole() {
-    }
+    @Enumerated(EnumType.STRING)
+    private RoleType roleType;
 }

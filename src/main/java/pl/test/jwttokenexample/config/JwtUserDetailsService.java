@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 import pl.test.jwttokenexample.dto.UserDTO;
 import pl.test.jwttokenexample.model.DAORole;
 import pl.test.jwttokenexample.model.DAOUser;
+import pl.test.jwttokenexample.repository.RoleRepository;
 import pl.test.jwttokenexample.repository.UserDaoRepository;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,6 +25,9 @@ public class JwtUserDetailsService implements UserDetailsService {
     private UserDaoRepository userDao;
 
     @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
     private PasswordEncoder bcryptEncoder;
 
     @Override
@@ -32,7 +35,7 @@ public class JwtUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Set authorities = new HashSet();
         DAOUser user = userDao.findByUsername(username);
-        user.getRoles().stream().forEach(x -> authorities.add(new SimpleGrantedAuthority("ROLE_" + x.getName())));
+        user.getRoles().stream().forEach(x -> authorities.add(new SimpleGrantedAuthority("ROLE_" + x.getRoleType())));
         if (user == null) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
@@ -45,9 +48,9 @@ public class JwtUserDetailsService implements UserDetailsService {
         DAOUser newUser = new DAOUser();
         newUser.setUsername(user.getUsername());
         newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
-        List<DAORole> roles = new ArrayList<>();
-        user.getRole().stream().forEach(x -> roles.add(new DAORole(x.getName())));
-        newUser.getRoles().addAll(roles);
+
+        List<DAORole> daoRoles = roleRepository.findAllByRoleTypeIn(user.getRole());
+        newUser.setRoles(daoRoles);
         return userDao.save(newUser);
     }
 }

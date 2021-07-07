@@ -21,11 +21,6 @@ public class DAOUser {
     @JsonIgnore
     private String password;
 
-    @OneToMany(
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.EAGER
-    )
-    @JoinColumn(name = "user_id")
+    @ManyToMany(cascade = CascadeType.PERSIST,fetch = FetchType.EAGER)
     private List<DAORole> roles = new ArrayList<>();
 }
