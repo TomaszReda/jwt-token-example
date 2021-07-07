@@ -23,7 +23,8 @@ public class DAOUser {
 
     @OneToMany(
             cascade = CascadeType.ALL,
-            orphanRemoval = true
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
     )
     @JoinColumn(name = "user_id")
     private List<DAORole> roles = new ArrayList<>();
